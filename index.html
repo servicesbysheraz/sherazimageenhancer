@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0284c7">
+<meta name="description" content="Rohan × Dev Image Enhancer: enhance your picture automatically and download it in one tap, right in your browser.">
+<title>Sheraz Image Enhancer — Image Enhancer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+:root{--ink:#0b2a44;--muted:#5b7890;--blue:#0284c7;--blue-d:#075985;--line:rgba(14,116,144,.14);--gold:#f5b31a;--gold-d:#b45309}
+body{font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;background:radial-gradient(700px 500px at 8% 4%,#d3f0ff 0,transparent 60%),radial-gradient(640px 480px at 96% 12%,#fff3cc 0,transparent 58%),radial-gradient(800px 600px at 50% 105%,#d9f1ff 0,transparent 60%),linear-gradient(180deg,#fbfdff,#eef8ff)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.ic{width:20px;height:20px;flex:none;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wrap{width:min(980px,calc(100% - 28px));margin:0 auto;padding-bottom:28px}
+
+/* liquid glass */
+.glass{position:relative;overflow:hidden;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.9);border-radius:24px;-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 10px 30px rgba(2,132,199,.1)}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.75) 0%,rgba(255,255,255,.05) 38%,rgba(255,255,255,0) 62%,rgba(255,255,255,.4) 100%)}
+.glass>*{position:relative}
+.weak .glass{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(255,255,255,.94)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:16px;padding:12px 18px;font-size:14.5px;font-weight:700;text-decoration:none;white-space:nowrap;transition:background .15s}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover:not(:disabled){background:var(--blue-d)}
+.btn-gold{background:#fcd34d;color:#3b2300}
+.btn-gold:hover{background:#fbbf24}
+.btn-ghost{background:rgba(255,255,255,.85);border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{background:#fff}
+.btn-big{padding:15px 28px;font-size:16px;border-radius:18px}
+
+/* header */
+.topbar{margin-top:14px;padding:12px 18px;border-radius:20px;display:flex;align-items:center}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid #fff;background:#000;box-shadow:0 3px 10px rgba(2,132,199,.25)}
+.brand strong{font-size:1.15rem;font-weight:800;letter-spacing:.03em;color:var(--blue-d)}
+.brand em{font-style:normal;color:var(--gold-d)}
+
+/* tool */
+.tool{margin-top:22px;padding:28px 24px}
+.intro{text-align:center;margin-bottom:20px}
+.intro h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800;letter-spacing:-.01em;line-height:1.15;color:var(--blue-d)}
+.intro p{color:var(--muted);margin:10px auto 0;max-width:560px;line-height:1.6}
+.dropzone{border:2px dashed rgba(2,132,199,.35);border-radius:20px;padding:44px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;background:rgba(255,255,255,.55);transition:border-color .2s,background .2s}
+.dropzone:hover,.dropzone.over{border-color:var(--gold);background:rgba(255,251,235,.75)}
+.drop-orb{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,#38bdf8,#0284c7);margin-bottom:4px}
+.drop-orb .ic{width:30px;height:30px;stroke-width:2.2}
+.dropzone h2{font-size:1.25rem;font-weight:800}
+.dropzone p{color:var(--muted);font-size:.93rem}
+.dropzone small{color:#6b8aa3;font-size:.8rem}
+.dropzone .btn{margin-top:6px}
+
+/* before / after */
+.viewer{position:relative;width:100%;max-height:70vh;border-radius:18px;overflow:hidden;cursor:ew-resize;user-select:none;touch-action:pan-y;background:repeating-conic-gradient(#eef7fc 0 25%,#fff 0 50%) 0 0/20px 20px;border:1px solid var(--line)}
+.viewer img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none}
+#imgAfter{clip-path:inset(0 0 0 50%)}
+.divider{position:absolute;top:0;bottom:0;left:50%;width:0;z-index:3;pointer-events:none}
+.divider::before{content:"";position:absolute;top:0;bottom:0;left:-1px;width:2px;background:#fff}
+.knob{position:absolute;top:50%;left:0;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;display:grid;place-items:center;color:var(--blue-d);background:#fff;border:3px solid var(--gold)}
+.knob .ic{width:20px;height:20px}
+.badge{position:absolute;top:10px;z-index:4;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;background:rgba(7,89,133,.85)}
+.badge.bl{left:10px}
+.badge.br{right:10px;background:rgba(245,179,26,.95);color:#2b1a00}
+.meta{margin-top:12px;text-align:center;font-size:13.5px;color:var(--muted);font-weight:600}
+.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:16px}
+.hint{text-align:center;margin-top:8px;font-size:12.5px;color:var(--muted)}
+
+/* pills */
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:20px}
+.chips span{padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--blue-d);background:rgba(255,255,255,.7);border:1px solid #fff;box-shadow:0 4px 12px rgba(2,132,199,.08)}
+
+/* developer card */
+.dev{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:22px;padding:22px}
+.dev-logo{width:124px;height:124px;flex:none;border-radius:50%;overflow:hidden;border:3px solid var(--gold);background:#000;box-shadow:0 6px 18px rgba(2,132,199,.2)}
+.dev-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.dev-info{flex:1;min-width:220px}
+.dev-info h2{font-size:1.45rem;font-weight:800;color:var(--blue-d)}
+.dev-info h2 em{font-style:normal;color:var(--gold-d)}
+.role{font-size:.78rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.12em;margin:4px 0 8px}
+.dev-info p{color:var(--muted);line-height:1.55;font-size:.95rem}
+.dev-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.foot{margin-top:22px;text-align:center;font-size:13px;color:var(--muted)}
+
+/* popups */
+.modal{border:0;padding:0;margin:auto;background:transparent;color:var(--ink);width:min(380px,calc(100vw - 28px))}
+.modal::backdrop{background:rgba(7,36,58,.35)}
+.modal[open] .pop{animation:pop .3s ease-out}
+.pop{position:relative;text-align:center;padding:28px 22px 22px;border-radius:24px;background:rgba(255,255,255,.97);border:1px solid #fff;box-shadow:0 20px 50px rgba(7,89,133,.25)}
+.x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;background:#fff;color:var(--blue-d)}
+.x .ic{width:18px;height:18px}
+.pop h2{font-size:1.4rem;font-weight:800;color:var(--blue-d)}
+.pop p{color:var(--muted);line-height:1.6;font-size:.95rem}
+.logo-big{width:120px;height:120px;margin:4px auto 14px;border-radius:50%;overflow:hidden;border:3px solid var(--gold);background:#000}
+.logo-big img{width:100%;height:100%;object-fit:cover;display:block}
+.pop .role{margin-bottom:10px}
+.pop .dev-btns{flex-direction:column;margin-top:16px}
+.pop .dev-btns .btn{width:100%}
+.w-crown{width:60px;height:60px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:var(--gold)}
+.w-crown .ic{width:28px;height:28px;fill:#fff;stroke:var(--gold-d)}
+.w-list{list-style:none;text-align:left;margin:16px 0 20px;display:grid;gap:8px}
+.w-list li{display:flex;align-items:center;gap:10px;background:#f5fbff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-weight:600;font-size:.92rem}
+.w-list li::before{content:"✓";display:grid;place-items:center;width:22px;height:22px;flex:none;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:800}
+
+/* toast & loader */
+.toast{position:fixed;left:50%;bottom:20px;z-index:200;transform:translate(-50%,160%);opacity:0;transition:transform .3s,opacity .3s;max-width:calc(100vw - 32px);padding:11px 16px;border-radius:999px;background:var(--blue-d);color:#fff;font-weight:600;font-size:14px;text-align:center;pointer-events:none}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.loader{position:fixed;inset:0;z-index:150;display:grid;place-items:center;background:rgba(244,250,255,.92)}
+.loader-card{padding:24px 28px;border-radius:18px;background:#fff;border:1px solid var(--line);text-align:center}
+.spin-ring{width:48px;height:48px;margin:0 auto 12px;border-radius:50%;border:5px solid #d6ecf8;border-top-color:var(--gold);animation:spin .8s linear infinite}
+.loader p{font-weight:700;color:var(--blue-d)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+@media(max-width:560px){
+  .tool{padding:20px 14px}
+  .dropzone{padding:30px 14px}
+  .dev-logo{width:104px;height:104px}
+  .actions .btn{width:100%}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m0 0l-5 5m5-5l5 5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v12m0 0l-5-5m5 5l5-5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1h5"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></symbol>
+<symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8z"/></symbol>
+</defs></svg>
+
+<div class="wrap">
+
+  <header class="topbar glass">
+    <div class="brand">
+      <img class="brand-logo" data-logo alt="Sheraz profile photo">
+      <strong>SHERAZ <em>×</em> OFFICIAL</strong>
+    </div>
+  </header>
+
+  <main class="tool glass">
+    <div class="intro" id="intro">
+      <h1>Image Enhancer</h1>
+      <p>Upload a picture. It is enhanced automatically and you can see the result right away. Download it in one tap.</p>
+    </div>
+
+    <div id="dz" class="dropzone" tabindex="0" role="button" aria-label="Upload a picture">
+      <div class="drop-orb"><svg class="ic" viewBox="0 0 24 24"><use href="#i-upload"/></svg></div>
+      <h2>Drop your picture here</h2>
+      <p>Click to browse · drag &amp; drop · or paste with Ctrl / ⌘ + V</p>
+      <span class="btn btn-blue"><svg class="ic" viewBox="0 0 24 24"><use href="#i-image"/></svg>Choose Picture</span>
+      <small>JPG · PNG · WEBP</small>
+    </div>
+
+    <div id="ws" hidden>
+      <div class="viewer" id="viewer" tabindex="0" role="slider" aria-label="Before and after comparison" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+        <img id="imgBefore" alt="Original picture">
+        <img id="imgAfter" alt="Enhanced picture">
+        <div class="divider" id="divider"><span class="knob"><svg class="ic" viewBox="0 0 24 24"><use href="#i-swap"/></svg></span></div>
+        <span class="badge bl">Original</span>
+        <span class="badge br">Enhanced</span>
+      </div>
+      <p class="hint">Drag the handle to compare before &amp; after</p>
+      <div class="meta" id="info">—</div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="change" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-upload"/></svg>Change picture</button>
+        <button class="btn btn-blue btn-big" id="dl" type="button" disabled><svg class="ic" viewBox="0 0 24 24"><use href="#i-download"/></svg>Download enhanced</button>
+      </div>
+    </div>
+  </main>
+
+  <section class="chips">
+    <span>✨ Automatic enhancement</span>
+    <span>🔍 Sharper detail</span>
+    <span>🔒 Private on your device</span>
+  </section>
+
+  <section class="glass dev" aria-label="Developer profile">
+    <div class="dev-logo"><img data-logo alt="Sheraz profile photo"></div>
+    <div class="dev-info">
+      <h2>Sheraz <em>×</em> Official</h2>
+      <p class="role">Web Developer · Digital Creator</p>
+      <p>Building fast, beautiful web tools and digital resources, from image editors to developer utilities. Let's build something awesome together.</p>
+      <div class="dev-btns">
+        <a class="btn btn-blue" data-portfolio target="_blank" rel="noopener"><svg class="ic" viewBox="0 0 24 24"><use href="#i-link"/></svg>My Portfolio</a>
+        <a class="btn btn-gold" data-smm target="_blank" rel="noopener"><svg class="ic" viewBox="0 0 24 24"><use href="#i-bolt"/></svg>2nd Portfolio</a>
+        <button class="btn btn-ghost" id="openDev" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-user"/></svg>Developer profile</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">© <span id="yr"></span> SHERAZ OFFICIAL</footer>
+</div>
+
+<dialog id="devDlg" class="modal" aria-labelledby="devName">
+  <div class="pop">
+    <button class="x" type="button" data-close aria-label="Close"><svg class="ic" viewBox="0 0 24 24"><use href="#i-close"/></svg></button>
+    <div class="logo-big"><img data-logo alt="Sheraz profile photo"></div>
+    <h2 id="devName">SHERAZ <em>×</em> OFFICIAL</h2>
+    <p class="role">Web Developer · Digital Creator</p>
+    <p>Building fast, beautiful web tools and digital resources. Let's build something awesome together.</p>
+    <div class="dev-btns">
+      <a class="btn btn-blue" data-portfolio target="_blank" rel="noopener"><svg class="ic" viewBox="0 0 24 24"><use href="#i-link"/></svg>View My Portfolio</a>
+      <a class="btn btn-gold" data-smm target="_blank" rel="noopener"><svg class="ic" viewBox="0 0 24 24"><use href="#i-bolt"/></svg>Visit My 2nd Portfolio</a>
+      <button class="btn btn-ghost" type="button" data-close>Close</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="welDlg" class="modal" aria-labelledby="welTitle">
+  <div class="pop">
+    <div class="w-crown"><svg class="ic" viewBox="0 0 24 24"><use href="#i-crown"/></svg></div>
+    <h2 id="welTitle">Welcome to OFFICIAL SHERAZ Website</h2>
+    <p>Turn small, blurry or dull pictures into sharper, brighter ones in seconds.</p>
+    <ul class="w-list">
+      <li>Automatic enhancement, no settings needed</li>
+      <li>Instant before &amp; after preview</li>
+      <li>One-tap download, processed on your device</li>
+    </ul>
+    <button class="btn btn-gold" id="welGo" type="button" style="width:100%">Start Enhancing ✨</button>
+  </div>
+</dialog>
+
+<input type="file" id="file" class="sr" accept="image/*">
+<div id="loader" class="loader" hidden><div class="loader-card"><div class="spin-ring"></div><p id="ltxt">Working…</p></div></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ===== CONFIG ===== */
+  const CONFIG = {
+    portfolio: 'https://shaizi-here.vercel.app',
+    smm: 'https://shaiziishere.vercel.app',
+    // Apni photo ko Vercel ke public folder mein 1.png naam se upload karein.
+    // Public folder ki image website par /1.png path se load hoti hai.
+    logo: '/1.png',
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const frame = () => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+  const weak = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4;
+  if (weak) document.documentElement.classList.add('weak');
+
+  // Pixel budgets: preview is quick, download is full quality (smaller on weak devices)
+  const CAP_PREVIEW = 3e6;
+  const CAP_DOWNLOAD = weak ? 6e6 : 12e6;
+
+  let S = { src: null, iw: 0, ih: 0, url: null, name: 'picture' };
+
+  /* ---------- sizing ---------- */
+  function plan(w, h, cap) {
+    const px = w * h;
+    let k = px < 2.5e6 ? Math.min(2, Math.sqrt(cap / px)) : Math.min(1, Math.sqrt(cap / px));
+    k = Math.max(0.05, Math.floor(k * 20) / 20);
+    return { W: Math.max(1, Math.round(w * k)), H: Math.max(1, Math.round(h * k)) };
+  }
+  function fitCanvas(src, iw, ih, maxSide) {
+    const k = Math.min(1, maxSide / Math.max(iw, ih));
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(iw * k));
+    c.height = Math.max(1, Math.round(ih * k));
+    const x = c.getContext('2d');
+    x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+    x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high';
+    x.drawImage(src, 0, 0, c.width, c.height);
+    return c;
+  }
+
+  /* ---------- fast box blur (sliding window, O(n)) ---------- */
+  function blur(src, w, h, r) {
+    const n = src.length, t = new Uint8ClampedArray(n), o = new Uint8ClampedArray(n), d = 2 * r + 1, row = w * 4;
+    for (let y = 0; y < h; y++) {
+      const b = y * row; let R = 0, G = 0, B = 0;
+      for (let k = -r; k <= r; k++) { const p = b + clamp(k, 0, w - 1) * 4; R += src[p]; G += src[p + 1]; B += src[p + 2]; }
+      for (let x = 0; x < w; x++) {
+        const q = b + x * 4; t[q] = R / d; t[q + 1] = G / d; t[q + 2] = B / d; t[q + 3] = 255;
+        const a = b + clamp(x + r + 1, 0, w - 1) * 4, c = b + clamp(x - r, 0, w - 1) * 4;
+        R += src[a] - src[c]; G += src[a + 1] - src[c + 1]; B += src[a + 2] - src[c + 2];
+      }
+    }
+    for (let x = 0; x < w; x++) {
+      const b = x * 4; let R = 0, G = 0, B = 0;
+      for (let k = -r; k <= r; k++) { const p = b + clamp(k, 0, h - 1) * row; R += t[p]; G += t[p + 1]; B += t[p + 2]; }
+      for (let y = 0; y < h; y++) {
+        const q = b + y * row; o[q] = R / d; o[q + 1] = G / d; o[q + 2] = B / d; o[q + 3] = 255;
+        const a = b + clamp(y + r + 1, 0, h - 1) * row, c = b + clamp(y - r, 0, h - 1) * row;
+        R += t[a] - t[c]; G += t[a + 1] - t[c + 1]; B += t[a + 2] - t[c + 2];
+      }
+    }
+    return o;
+  }
+
+  /* ---------- automatic enhancement pipeline ---------- */
+  function enhance(src, sw, sh, cap) {
+    const { W, H } = plan(sw, sh, cap), px = W * H;
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const x = c.getContext('2d', { willReadFrequently: true });
+    x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+    x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high';
+    x.drawImage(src, 0, 0, W, H);
+    const id = x.getImageData(0, 0, W, H), d = id.data, n = d.length;
+
+    // 1) clean-up: edge-preserving denoise (flat areas smooth, edges stay crisp)
+    let b = blur(d, W, H, 2);
+    for (let i = 0; i < n; i += 4) for (let k = 0; k < 3; k++) {
+      const v = d[i + k], bv = b[i + k];
+      const w = clamp(1 - Math.abs(v - bv) / 30, 0, 1) * 0.65;
+      d[i + k] = v + (bv - v) * w;
+    }
+    b = null;
+
+    // 2) auto white balance (gray world, limited to +/-8%)
+    let sr = 0, sg = 0, sb = 0;
+    for (let i = 0; i < n; i += 4) { sr += d[i]; sg += d[i + 1]; sb += d[i + 2]; }
+    const mr = sr / px, mg = sg / px, mb = sb / px, mm = (mr + mg + mb) / 3 || 1;
+    const kr = clamp(mm / (mr || 1), 0.92, 1.08), kg = clamp(mm / (mg || 1), 0.92, 1.08), kb = clamp(mm / (mb || 1), 0.92, 1.08);
+    for (let i = 0; i < n; i += 4) { d[i] *= kr; d[i + 1] *= kg; d[i + 2] *= kb; }
+
+    // 3) auto exposure, levels and soft S-curve contrast
+    const hist = new Uint32Array(256);
+    for (let i = 0; i < n; i += 4) hist[(d[i] * 77 + d[i + 1] * 150 + d[i + 2] * 29) >> 8]++;
+    let lo = 0, hi = 255, acc = 0;
+    for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= px * 0.005) { lo = v; break; } }
+    acc = 0;
+    for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc >= px * 0.005) { hi = v; break; } }
+    if (hi - lo < 60) { lo = 0; hi = 255; }
+    let meanL = 0;
+    for (let v = 0; v < 256; v++) meanL += hist[v] * v;
+    meanL /= px;
+    const xm = clamp((meanL - lo) / (hi - lo), 0.05, 0.95);
+    const gamma = clamp(Math.log(0.5) / Math.log(xm), 0.8, 1.3);
+    const LUT = new Uint8ClampedArray(256);
+    for (let v = 0; v < 256; v++) {
+      const t = Math.pow(clamp((v - lo) / (hi - lo), 0, 1), gamma);
+      const s = t * t * (3 - 2 * t);
+      LUT[v] = (t + (s - t) * 0.35) * 255;
+    }
+    for (let i = 0; i < n; i += 4) { d[i] = LUT[d[i]]; d[i + 1] = LUT[d[i + 1]]; d[i + 2] = LUT[d[i + 2]]; }
+
+    // 4) color: richer tones; muted colors get more boost, skin tones are protected
+    for (let i = 0; i < n; i += 4) {
+      const r = d[i], g = d[i + 1], bl = d[i + 2];
+      const Y = 0.299 * r + 0.587 * g + 0.114 * bl;
+      const mx = Math.max(r, g, bl), mn = Math.min(r, g, bl), chroma = mx - mn;
+      const skin = (r > g && g > bl && r - bl > 20 && chroma < 170) ? 0.5 : 1;
+      const amt = 1 + (0.12 + 0.28 * (1 - chroma / 255)) * skin;
+      d[i] = Y + (r - Y) * amt; d[i + 1] = Y + (g - Y) * amt; d[i + 2] = Y + (bl - Y) * amt;
+    }
+
+    // 5) local clarity: wide local contrast adds depth and punch
+    let f = blur(d, W, H, Math.max(3, Math.round(Math.min(W, H) / 60)));
+    for (let i = 0; i < n; i += 4) for (let k = 0; k < 3; k++) {
+      const v = d[i + k];
+      d[i + k] = v + (v - f[i + k]) * 0.2;
+    }
+
+    // 6) sharpen fine detail (threshold keeps noise and halos down)
+    f = blur(d, W, H, 1);
+    for (let i = 0; i < n; i += 4) for (let k = 0; k < 3; k++) {
+      const v = d[i + k], df = v - f[i + k];
+      if (df > 1.5 || df < -1.5) d[i + k] = v + df * 0.8;
+    }
+    f = null;
+
+    x.putImageData(id, 0, 0);
+    return c;
+  }
+
+  /* ---------- loading ---------- */
+  const toBlob = (cv, type = 'image/jpeg', q = 0.92) => new Promise((res, rej) => cv.toBlob((b) => (b ? res(b) : rej(new Error('encode'))), type, q));
+  const urls = {};
+  function setImg(id, blob) {
+    if (urls[id]) URL.revokeObjectURL(urls[id]);
+    urls[id] = URL.createObjectURL(blob);
+    const el = $(id);
+    el.onerror = () => toast('Preview could not be shown. Try a JPG picture.');
+    el.src = urls[id];
+  }
+  const safeName = (n) => (n || 'picture').replace(/\.[^.]+$/, '').replace(/[^\w-]+/g, '_') || 'picture';
+
+  async function toDrawable(file) {
+    if (window.createImageBitmap) {
+      try { return { src: await createImageBitmap(file), url: null }; } catch (e) { /* fall back below */ }
+    }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    return { src: img, url };
+  }
+
+  async function load(file) {
+    if (!file) return;
+    if (file.type && !file.type.startsWith('image/')) { toast('Please choose a picture (JPG, PNG or WEBP)'); return; }
+    showL('Enhancing your picture…');
+    await frame();
+    try {
+      const { src, url } = await toDrawable(file);
+      const iw = src.naturalWidth || src.width, ih = src.naturalHeight || src.height;
+      if (!iw || !ih) throw new Error('no size');
+      if (S.url) URL.revokeObjectURL(S.url);
+      S = { src, iw, ih, url, name: safeName(file.name) };
+
+      const pv = fitCanvas(src, iw, ih, 1800);                       // quick preview source
+      const enh = enhance(pv, pv.width, pv.height, CAP_PREVIEW);     // automatic enhancement
+
+      const beforeCv = document.createElement('canvas');
+      beforeCv.width = enh.width; beforeCv.height = enh.height;
+      const bx = beforeCv.getContext('2d');
+      bx.imageSmoothingEnabled = true; bx.imageSmoothingQuality = 'high';
+      bx.drawImage(pv, 0, 0, enh.width, enh.height);
+      const [bBlob, aBlob] = await Promise.all([toBlob(beforeCv), toBlob(enh)]);
+      beforeCv.width = 0; beforeCv.height = 0;
+      setImg('imgBefore', bBlob);
+      setImg('imgAfter', aBlob);
+      $('viewer').style.aspectRatio = enh.width + ' / ' + enh.height;
+      setPos(50);
+      $('dz').hidden = true; $('intro').hidden = true; $('ws').hidden = false;
+      $('dl').disabled = false;
+      $('info').textContent = `Original ${iw}×${ih} · enhanced automatically`;
+      toast('Enhanced ✨ Tap Download to save it');
+    } catch (e) {
+      console.error(e);
+      toast('Could not open this picture. Try a JPG or PNG (iPhone HEIC photos: convert to JPG first).');
+    } finally {
+      hideL();
+    }
+  }
+
+  /* ---------- one-tap download (full quality) ---------- */
+  async function download() {
+    if (!S.src) return;
+    showL('Preparing your full-quality picture…');
+    await frame(); await frame();
+    let c = null;
+    try {
+      c = enhance(S.src, S.iw, S.ih, CAP_DOWNLOAD);
+      const blob = await new Promise((res) => c.toBlob(res, 'image/jpeg', 0.93));
+      if (!blob) throw new Error('encode');
+      const u = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = u; a.download = `${S.name}-enhanced.jpg`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(u), 10000);
+      toast('Downloaded ✓');
+    } catch (e) {
+      console.error(e);
+      toast('Download failed on this device. Try a smaller picture.');
+    } finally {
+      if (c) { c.width = 0; c.height = 0; }
+      hideL();
+    }
+  }
+
+  /* ---------- before / after compare ---------- */
+  const V = $('viewer');
+  let drag = false, pos = 50;
+  function setPos(p) {
+    pos = clamp(p, 0, 100);
+    $('divider').style.left = pos + '%';
+    $('imgAfter').style.clipPath = `inset(0 0 0 ${pos}%)`;
+    V.setAttribute('aria-valuenow', Math.round(pos));
+  }
+  const at = (e) => { const r = V.getBoundingClientRect(); return ((e.clientX - r.left) / r.width) * 100; };
+  V.addEventListener('pointerdown', (e) => { drag = true; V.setPointerCapture(e.pointerId); setPos(at(e)); });
+  V.addEventListener('pointermove', (e) => { if (drag) setPos(at(e)); });
+  const endDrag = () => { drag = false; };
+  V.addEventListener('pointerup', endDrag);
+  V.addEventListener('pointercancel', endDrag);
+  V.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') { setPos(pos - 5); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { setPos(pos + 5); e.preventDefault(); }
+  });
+
+  /* ---------- toast & loader ---------- */
+  let tt;
+  function toast(m) {
+    const t = $('toast');
+    t.textContent = m; t.classList.add('show');
+    clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+  function showL(m) { $('ltxt').textContent = m; $('loader').hidden = false; }
+  function hideL() { $('loader').hidden = true; }
+
+  /* ---------- wiring ---------- */
+  const dz = $('dz'), fi = $('file'), pick = () => fi.click();
+  dz.addEventListener('click', pick);
+  dz.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+  $('change').addEventListener('click', pick);
+  $('dl').addEventListener('click', download);
+  fi.addEventListener('change', (e) => { load(e.target.files[0]); e.target.value = ''; });
+  ['dragenter', 'dragover'].forEach((t) => dz.addEventListener(t, (e) => { e.preventDefault(); dz.classList.add('over'); }));
+  dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+  window.addEventListener('dragover', (e) => e.preventDefault());
+  window.addEventListener('drop', (e) => {
+    e.preventDefault(); dz.classList.remove('over');
+    const f = e.dataTransfer && e.dataTransfer.files[0];
+    if (f) load(f);
+  });
+  window.addEventListener('paste', (e) => {
+    const f = e.clipboardData && e.clipboardData.files[0];
+    if (f) load(f);
+  });
+
+  /* ---------- popups ---------- */
+  $('openDev').addEventListener('click', () => $('devDlg').showModal());
+  $('welGo').addEventListener('click', () => { $('welDlg').close(); pick(); });
+  document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => b.closest('dialog').close()));
+  document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
+
+  /* ---------- init ---------- */
+  $('yr').textContent = new Date().getFullYear();
+  document.querySelectorAll('[data-portfolio]').forEach((a) => { a.href = CONFIG.portfolio; });
+  document.querySelectorAll('[data-smm]').forEach((a) => { a.href = CONFIG.smm; });
+  if (CONFIG.logo && !CONFIG.logo.startsWith('__')) {
+    document.querySelectorAll('img[data-logo]').forEach((i) => {
+       i.src = CONFIG.logo;
+       i.onerror = () => console.error('Logo image load nahi hui. Vercel public folder mein 1.png check karein:', CONFIG.logo);
+     });
+  }
+  try {
+    if (!localStorage.getItem('rd_welcome')) {
+      localStorage.setItem('rd_welcome', '1');
+      setTimeout(() => $('welDlg').showModal(), 700);
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
